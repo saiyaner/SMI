@@ -1,0 +1,13 @@
+controller/DashboardController.class
+model/Product.class
+controller/LoginController.class
+model/Supplier.class
+model/Inventory.class
+model/Transaction.class
+database/Database.class
+application/Main.class
+model/Category.class
+model/User.class
+model/Customer.class
+model/FoodProduct.class
+model/ElectronicProduct.class
