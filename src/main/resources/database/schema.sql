@@ -1,13 +1,10 @@
 -- =============================================
 -- SMI - Sistem Manajemen Inventori
--- Schema Database (MySQL 8+)
+-- Schema Database (MySQL 8 / MariaDB 10.6+)
 -- =============================================
 
-CREATE DATABASE IF NOT EXISTS smi_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE smi_db;
+-- Database & USE di-handle oleh DatabaseInitializer
+-- jadi file ini fokus ke tabel + seed saja.
 
 -- ---------------------------------------------
 -- 1. USERS
@@ -22,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------
--- 2. CATEGORIES  (user bisa nambah, tapi diproteksi)
+-- 2. CATEGORIES (user bisa nambah, ada unique constraint)
 -- ---------------------------------------------
 CREATE TABLE IF NOT EXISTS categories (
     id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -84,7 +81,7 @@ CREATE TABLE IF NOT EXISTS inventory (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------
--- 6. STOCK_TRANSACTIONS (kartu stok)
+-- 6. STOCK_TRANSACTIONS
 -- ---------------------------------------------
 CREATE TABLE IF NOT EXISTS stock_transactions (
     id          INT AUTO_INCREMENT PRIMARY KEY,
@@ -133,21 +130,25 @@ CREATE TABLE IF NOT EXISTS transaction_details (
 -- ---------------------------------------------
 -- INDEX
 -- ---------------------------------------------
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_products_supplier ON products(supplier_id);
-CREATE INDEX idx_stock_tanggal     ON stock_transactions(tanggal);
-CREATE INDEX idx_trx_tanggal       ON transactions(tanggal);
+-- CREATE INDEX idx_products_category ON products(category_id);
+-- CREATE INDEX idx_products_supplier ON products(supplier_id);
+-- CREATE INDEX idx_stock_tanggal     ON stock_transactions(tanggal);
+-- CREATE INDEX idx_trx_tanggal       ON transactions(tanggal);
 
 -- ---------------------------------------------
--- SEED DATA
+-- SEED: user default
+-- Password asli: admin123 / kasir123 / gudang123
+-- (hash di bawah adalah placeholder — nanti di-generate ulang
+--  lewat BCryptUtil saat pertama kali login/register)
 -- ---------------------------------------------
--- Password default: admin123 / kasir123 / gudang123
--- Hash BCrypt (cost 10) sudah di-generate
 INSERT IGNORE INTO users (username, password_hash, nama_lengkap, role) VALUES
-('admin',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Administrator', 'ADMIN'),
-('kasir1',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Kasir Satu',    'KASIR'),
-('gudang1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Staff Gudang',  'GUDANG');
+('admin',   '$2a$10$placeholderHashForAdminAccount000000000000000000000', 'Administrator', 'ADMIN'),
+('kasir1',  '$2a$10$placeholderHashForKasirAccount000000000000000000000', 'Kasir Satu',    'KASIR'),
+('gudang1', '$2a$10$placeholderHashForGudangAccount00000000000000000000', 'Staff Gudang',  'GUDANG');
 
+-- ---------------------------------------------
+-- SEED: kategori awal (5 dasar)
+-- ---------------------------------------------
 INSERT IGNORE INTO categories (nama, deskripsi) VALUES
 ('Makanan',      'Produk makanan dan minuman'),
 ('Minuman',      'Produk minuman kemasan / segar'),
@@ -155,7 +156,10 @@ INSERT IGNORE INTO categories (nama, deskripsi) VALUES
 ('Alat Tulis',   'Alat tulis kantor dan sekolah'),
 ('Perlengkapan', 'Perlengkapan rumah tangga dan kebersihan');
 
+-- ---------------------------------------------
+-- SEED: supplier contoh
+-- ---------------------------------------------
 INSERT IGNORE INTO suppliers (nama, alamat, telepon, email, tipe_barang) VALUES
-('PT Sumber Pangan',  'Jl. Merdeka No.1',   '021-1111', 'sales@sumberpangan.id', 'MAKANAN'),
-('CV Elektro Jaya',   'Jl. Sudirman No.2',  '021-2222', 'info@elektrojaya.id',   'ELEKTRONIK'),
-('UD Serba Ada',      'Jl. Pasar Baru No.3','021-3333', 'ud.serbaada@gmail.com', 'LAINNYA');
+('PT Sumber Pangan', 'Jl. Merdeka No.1',    '021-1111', 'sales@sumberpangan.id', 'MAKANAN'),
+('CV Elektro Jaya',  'Jl. Sudirman No.2',   '021-2222', 'info@elektrojaya.id',   'ELEKTRONIK'),
+('UD Serba Ada',     'Jl. Pasar Baru No.3', '021-3333', 'ud.serbaada@gmail.com', 'LAINNYA');
